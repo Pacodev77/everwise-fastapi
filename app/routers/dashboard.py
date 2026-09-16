@@ -67,12 +67,14 @@ async def render_composite_chart_fragment(
 ):
     """Endpoint HTMX para renderizar el gráfico y semáforo del Índice Compuesto."""
     response = calcular_indice_compuesto(ciclo_escolar=ciclo)
+    points_dict = [p.model_dump() for p in response.points]
     return templates.TemplateResponse(
         request=request,
         name="fragments/composite_chart.html",
         context={
             "ciclo": ciclo,
-            "composite_response": response
+            "composite_response": response,
+            "points_json": points_dict
         }
     )
 
