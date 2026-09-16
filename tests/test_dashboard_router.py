@@ -4,12 +4,15 @@ import pytest
 from fastapi.testclient import TestClient
 from app.main import app
 from app.routers.auth import SESSION_COOKIE_NAME
+from app.services.data_repository import DataRepository
 
 client = TestClient(app, follow_redirects=False)
 
 @pytest.fixture
 def auth_cookie():
-    response = client.post("/login", data={"username": "director", "password": "123"})
+    repo = DataRepository()
+    repo.clear_must_change_password("director", repo.hash_password_bcrypt("SecurePass2026!"))
+    response = client.post("/login", data={"username": "director", "password": "SecurePass2026!"})
     return response.cookies.get(SESSION_COOKIE_NAME)
 
 def test_dashboard_unauthenticated_redirects():
@@ -42,7 +45,7 @@ def test_reproducir_solucion_bug_selector_ciclo_escolar(auth_cookie):
     assert resp2.status_code == 200
     assert "2026 - 2027" in resp2.text
     assert "84.2%" in resp2.text
-    assert "87.8%" not in resp2.text  # Garantiza que el valor anterior NO se quedó en memoria
+    assert "87.8%" not in resp2.text
 
     # 3. Retorno a Ciclo 2024 - 2025
     resp3 = client.get("/dashboard/fragments/kpis?ciclo=2024 - 2025")

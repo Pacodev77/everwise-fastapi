@@ -83,7 +83,10 @@ def test_logout_clears_cookie():
     assert logout_resp.headers["location"] == "/login"
 
 def test_rbac_isolation_misiones_denied_nuevosur():
-    login_resp = client.post("/login", data={"username": "misiones", "password": "123"})
+    repo = DataRepository()
+    repo.clear_must_change_password("misiones", repo.hash_password_bcrypt("SecurePass2026!"))
+
+    login_resp = client.post("/login", data={"username": "misiones", "password": "SecurePass2026!"})
     cookie = login_resp.cookies.get(SESSION_COOKIE_NAME)
 
     client.cookies.set(SESSION_COOKIE_NAME, cookie)
