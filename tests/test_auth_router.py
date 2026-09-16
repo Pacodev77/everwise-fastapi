@@ -8,15 +8,6 @@ from app.routers.auth import SESSION_COOKIE_NAME, require_role, get_current_user
 from app.models.user import UserBase
 from app.services.data_repository import DataRepository
 
-# Router auxiliar para verificar RBAC
-rbac_dummy_router = APIRouter(prefix="/test-campus", tags=["TestRBAC"])
-
-@rbac_dummy_router.get("/nuevosur")
-async def dummy_nuevosur_endpoint(user: UserBase = Depends(require_role(["Nuevo Sur"]))):
-    return {"message": "Bienvenido a Nuevo Sur"}
-
-app.include_router(rbac_dummy_router)
-
 client = TestClient(app, follow_redirects=False)
 
 def test_login_page_renders():
@@ -83,6 +74,7 @@ def test_logout_clears_cookie():
     assert logout_resp.headers["location"] == "/login"
 
 def test_rbac_isolation_misiones_denied_nuevosur():
+    """Confirma que la ruta REAL /campus/nuevosur retorna 403 Forbidden a un coordinador del campus Misiones."""
     repo = DataRepository()
     repo.clear_must_change_password("misiones", repo.hash_password_bcrypt("SecurePass2026!"))
 
@@ -90,7 +82,7 @@ def test_rbac_isolation_misiones_denied_nuevosur():
     cookie = login_resp.cookies.get(SESSION_COOKIE_NAME)
 
     client.cookies.set(SESSION_COOKIE_NAME, cookie)
-    resp = client.get("/test-campus/nuevosur")
+    resp = client.get("/campus/nuevosur")
     
     assert resp.status_code == 403
     assert "Acceso Restringido" in resp.json()["detail"]

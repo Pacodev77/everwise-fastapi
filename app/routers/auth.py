@@ -66,7 +66,7 @@ def get_current_user(request: Request) -> UserBase:
 def require_role(allowed_roles: List[str]):
     """Dependencia de autorización basada en roles (RBAC). Retorna 403 Forbidden si el rol no está autorizado."""
     def role_checker(user: UserBase = Depends(get_current_user)):
-        if user.role not in allowed_roles and "General" not in allowed_roles:
+        if user.role not in allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Acceso Restringido: Tu rol de '{user.role}' no cuenta con permisos para este recurso."
