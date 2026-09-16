@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Everwise | Acceso Corporativo</title>
+    <link rel="icon" type="image/png" href="/static/img/letra_blue.png">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body style="background-color: #0f172a; display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+    <div class="login-container">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <img src="/static/img/letra_blue.png" alt="Everwise" style="height: 48px; margin-bottom: 0.5rem;">
+            <h1 style="font-size: 1.75rem; font-weight: 800; color: #ffffff;">Everwise</h1>
+            <p style="color: #94a3b8; font-size: 0.88rem; margin-top: 0.2rem;">Sistema Ejecutivo de Inteligencia Educativa · Instituto Agustín</p>
+        </div>
+
+        {% if error %}
+        <div style="background-color: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1.25rem;">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form action="/login" method="POST">
+            <div class="form-group">
+                <label class="form-label" for="username">Usuario Corporativo</label>
+                <input class="form-control" type="text" id="username" name="username" placeholder="director / misiones / nuevosur / sanagustin" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Contraseña</label>
+                <input class="form-control" type="password" id="password" name="password" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn-primary" style="margin-top: 0.5rem;">Ingresar al Sistema</button>
+        </form>
+
+        <div style="background-color: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 0.85rem 1rem; margin-top: 1.5rem; font-size: 0.8rem; color: #94a3b8;">
+            <strong style="color: #cbd5e1;">Perfiles de Acceso (RBAC):</strong><br>
+            • <code>director</code>: Visión Global Consolidada y Multisede<br>
+            • <code>misiones</code>, <code>nuevosur</code>, <code>sanagustin</code>: Aislamiento por Campus<br>
+            <em style="color: #64748b;">Contraseña universal: <code>123</code> (Migración Bcrypt activa)</em>
+        </div>
+    </div>
+</body>
+</html>

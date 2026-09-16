@@ -1,0 +1,42 @@
+<!-- app/templates/pages/dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}Everwise | Resumen Ejecutivo Global{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="dashboard-title">Resumen Data {{ ciclo_seleccionado }}</div>
+    <div class="dashboard-subtitle">Estado académico y operativo consolidado por campus · Instituto Agustín</div>
+</div>
+
+<!-- Barra de pestañas -->
+<div class="tabs-header">
+    <button class="tab-btn active">Resumen Ejecutivo</button>
+    <button class="tab-btn" onclick="alert('Disponible en la vista de detalle')">Desempeño Académico</button>
+    <button class="tab-btn" onclick="alert('Disponible en la vista de detalle')">Clima Escolar</button>
+    <button class="tab-btn" onclick="alert('Disponible en la vista de detalle')">Disciplina</button>
+</div>
+
+<!-- Contenedor 1: Tarjetas KPI HTMX Swap -->
+<div id="kpi-container" 
+     hx-get="/dashboard/fragments/kpis?ciclo={{ ciclo_seleccionado }}" 
+     hx-trigger="load, reloadKpis from:body">
+    <div style="color: #94a3b8; font-size: 0.9rem; padding: 1rem 0;">Cargando KPIs ejecutivos...</div>
+</div>
+
+<!-- Contenedor 2: Gráfico Índice Compuesto HTMX Swap -->
+<div id="composite-container" 
+     hx-get="/dashboard/fragments/composite_chart?ciclo={{ ciclo_seleccionado }}" 
+     hx-trigger="load, reloadChart from:select[name='ciclo']"
+     hx-include="[name='ciclo']">
+    <div style="color: #94a3b8; font-size: 0.9rem; padding: 1rem 0;">Cargando Índice Compuesto...</div>
+</div>
+
+<!-- Contenedor 3: AI Insights Gemini HTMX Swap -->
+<div id="ai-container" 
+     hx-get="/dashboard/fragments/ai_insights?ciclo={{ ciclo_seleccionado }}" 
+     hx-trigger="load, reloadInsights from:select[name='ciclo']"
+     hx-include="[name='ciclo']">
+    <div style="color: #94a3b8; font-size: 0.9rem; padding: 1rem 0;">Generando recomendaciones con Gemini AI...</div>
+</div>
+{% endblock %}

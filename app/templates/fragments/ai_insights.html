@@ -1,0 +1,48 @@
+<!-- app/templates/fragments/ai_insights.html -->
+<div class="card">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+        <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: #ffffff;">Plan de Acción Ejecutivo · Gemini AI</h3>
+            <p style="font-size: 0.85rem; color: #94a3b8;">Recomendaciones generadas automáticamente a partir de datos reales (Ciclo {{ ciclo }})</p>
+        </div>
+        <span class="badge badge-ok">AI Model: Gemini 1.5 Flash</span>
+    </div>
+
+    <div class="grid-3" style="margin-bottom: 0;">
+        <!-- Eje 1: Qué Mantener -->
+        <div style="background-color: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 1.25rem;">
+            <h4 style="color: #34d399; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.75rem;">
+                ✓ Qué Mantener (Fortalezas)
+            </h4>
+            <ul style="list-style: none; font-size: 0.85rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 8px;">
+                {% for item in insights.mantener %}
+                <li>• {{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Eje 2: Qué Mejorar -->
+        <div style="background-color: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 12px; padding: 1.25rem;">
+            <h4 style="color: #fbbf24; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.75rem;">
+                ⚡ Qué Mejorar (Oportunidades)
+            </h4>
+            <ul style="list-style: none; font-size: 0.85rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 8px;">
+                {% for item in insights.mejorar %}
+                <li>• {{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Eje 3: Qué Modificar -->
+        <div style="background-color: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 12px; padding: 1.25rem;">
+            <h4 style="color: #f87171; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.75rem;">
+                🛠️ Qué Modificar (Intervención)
+            </h4>
+            <ul style="list-style: none; font-size: 0.85rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 8px;">
+                {% for item in insights.modificar %}
+                <li>• {{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>

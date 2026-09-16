@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Everwise | Dashboard Ejecutivo{% endblock %}</title>
+    <link rel="icon" type="image/png" href="/static/img/letra_blue.png">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Chart.js para renderizado de gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <!-- HTMX Library -->
+    <script src="/static/js/htmx.min.js"></script>
+    <script src="/static/js/dashboard_charts.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        {% include "components/sidebar.html" %}
+
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>
