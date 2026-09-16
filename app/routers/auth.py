@@ -74,6 +74,26 @@ def require_role(allowed_roles: List[str]):
         return user
     return role_checker
 
+def resolve_campus_for_user(user: UserBase, requested_campus: Optional[str] = None) -> str:
+    """
+    Función centralizada para resolución de campus según el rol del usuario:
+    - Si el usuario no es 'General' (ej. 'Misiones', 'Nuevo Sur', 'San Agustín'), se forzará su propio campus.
+    - Si el usuario es 'General' (Director General), se respeta el campus solicitado (default 'Global').
+    """
+    if user.role != "General":
+        return user.role
+    return requested_campus or "Global"
+
+def filter_logs_by_user_role(logs: List[dict], user: UserBase) -> List[dict]:
+    """
+    Función centralizada para filtrado por rol de campus en registros y exportaciones:
+    - Si el usuario es 'General', retorna TODOS los registros institucionales.
+    - Si el usuario es de un campus específico, retorna solo los registros pertenecientes a su campus o 'Global'.
+    """
+    if user.role == "General":
+        return logs
+    return [log for log in logs if log.get("Campus") in [user.role, "Global"]]
+
 @router.get("/login", response_class=HTMLResponse)
 async def render_login_page(request: Request):
     user = get_current_user_optional(request)

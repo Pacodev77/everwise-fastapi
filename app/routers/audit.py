@@ -8,7 +8,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from app.models.user import UserBase
-from app.routers.auth import require_role, get_current_user
+from app.routers.auth import require_role, get_current_user, filter_logs_by_user_role
 from app.services.data_repository import DataRepository
 
 router = APIRouter(prefix="/audit", tags=["Audit CRM"])
@@ -35,9 +35,8 @@ async def render_audit_table_fragment(
     repo = DataRepository()
     raw_logs = repo.get_audit_logs(limit=150, ciclo_escolar=ciclo)
 
-    # Filtrar por rol de campus si el usuario no es Director General
-    if user.role != "General":
-        raw_logs = [log for log in raw_logs if log.get("Campus") in [user.role, "Global"]]
+    # Filtrar por rol de campus usando función centralizada
+    raw_logs = filter_logs_by_user_role(raw_logs, user)
 
     # Filtrar por búsqueda si se especificó
     if search:
@@ -67,11 +66,8 @@ async def export_audit_csv(
     repo = DataRepository()
     raw_logs = repo.get_audit_logs(limit=1000, ciclo_escolar=ciclo)
 
-    # Filtrar en memoria / BD según rol de campus
-    if user.role != "General":
-        filtered_logs = [log for log in raw_logs if log.get("Campus") == user.role]
-    else:
-        filtered_logs = raw_logs
+    # Filtrar mediante función centralizada
+    filtered_logs = filter_logs_by_user_role(raw_logs, user)
 
     output = io.StringIO()
     writer = csv.writer(output)

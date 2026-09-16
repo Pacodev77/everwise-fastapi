@@ -11,7 +11,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.config import settings
 from app.models.user import UserBase
-from app.routers.auth import get_current_user, require_role, get_current_user_optional
+from app.routers.auth import get_current_user, require_role, get_current_user_optional, resolve_campus_for_user
 from app.services.data_repository import DataRepository
 from app.services.audit_service import registrar_evento_auditoria
 from app.services.academic_service import parse_academic_excel, InvalidFileFormatException
@@ -105,7 +105,7 @@ async def upload_academic_file(
         sanitized_name = validate_and_sanitize_file(file, content)
 
         # Si el usuario es de un campus específico, forzar ese campus
-        user_campus = user.role if user.role != "General" else campus
+        user_campus = resolve_campus_for_user(user, campus)
 
         df = parse_academic_excel(content, ciclo_escolar=ciclo, campus=user_campus)
         if df.empty:
@@ -152,7 +152,7 @@ async def upload_ixl_file(
     try:
         content = await file.read()
         sanitized_name = validate_and_sanitize_file(file, content)
-        user_campus = user.role if user.role != "General" else campus
+        user_campus = resolve_campus_for_user(user, campus)
 
         df = parse_ixl_diagnostic(content, ciclo_escolar=ciclo, campus=user_campus)
         if df.empty:
@@ -199,7 +199,7 @@ async def upload_asistencia_file(
     try:
         content = await file.read()
         sanitized_name = validate_and_sanitize_file(file, content)
-        user_campus = user.role if user.role != "General" else campus
+        user_campus = resolve_campus_for_user(user, campus)
 
         df = parse_asistencia_file(content, ciclo_escolar=ciclo, campus=user_campus)
         if df.empty:
@@ -247,7 +247,7 @@ async def upload_clima_disciplina_file(
     try:
         content = await file.read()
         sanitized_name = validate_and_sanitize_file(file, content)
-        user_campus = user.role if user.role != "General" else campus
+        user_campus = resolve_campus_for_user(user, campus)
 
         df = parse_clima_disciplina_file(content, tipo=tipo, ciclo_escolar=ciclo, campus=user_campus)
         if df.empty:

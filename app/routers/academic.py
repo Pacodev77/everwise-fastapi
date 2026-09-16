@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from app.models.user import UserBase
-from app.routers.auth import require_role
+from app.routers.auth import require_role, resolve_campus_for_user
 from app.services.data_repository import DataRepository
 from app.services.academic_service import get_academic_summary
 
@@ -33,7 +33,7 @@ async def render_academic_fragment(
     user: UserBase = Depends(require_role(["General", "Misiones", "Nuevo Sur", "San Agustín"]))
 ):
     repo = DataRepository()
-    user_campus = user.role if user.role != "General" else (campus or "Global")
+    user_campus = resolve_campus_for_user(user, campus)
 
     summary = get_academic_summary(ciclo_escolar=ciclo, campus=user_campus, repo=repo)
 

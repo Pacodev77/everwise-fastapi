@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from app.models.user import UserBase
-from app.routers.auth import require_role
+from app.routers.auth import require_role, resolve_campus_for_user
 from app.services.data_repository import DataRepository
 from app.services.clima_disciplina_service import get_clima_summary, get_disciplina_summary
 
@@ -43,7 +43,7 @@ async def render_clima_fragment(
     user: UserBase = Depends(require_role(["General", "Misiones", "Nuevo Sur", "San Agustín"]))
 ):
     repo = DataRepository()
-    user_campus = user.role if user.role != "General" else (campus or "Global")
+    user_campus = resolve_campus_for_user(user, campus)
     summary = get_clima_summary(ciclo_escolar=ciclo, campus=user_campus, repo=repo)
 
     return templates.TemplateResponse(
@@ -60,7 +60,7 @@ async def render_disciplina_fragment(
     user: UserBase = Depends(require_role(["General", "Misiones", "Nuevo Sur", "San Agustín"]))
 ):
     repo = DataRepository()
-    user_campus = user.role if user.role != "General" else (campus or "Global")
+    user_campus = resolve_campus_for_user(user, campus)
     summary = get_disciplina_summary(ciclo_escolar=ciclo, campus=user_campus, repo=repo)
 
     return templates.TemplateResponse(
