@@ -8,6 +8,7 @@ from app.routers.auth import SESSION_COOKIE_NAME
 client = TestClient(app, follow_redirects=False)
 
 def get_session_cookie(username: str = "director", password: str = "123") -> str:
+    client.cookies.clear()
     login_resp = client.post("/login", data={"username": username, "password": password})
     cookie = login_resp.cookies.get(SESSION_COOKIE_NAME)
     client.cookies.set(SESSION_COOKIE_NAME, cookie)
