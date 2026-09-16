@@ -75,6 +75,7 @@ def test_logout_clears_cookie():
 
 def test_rbac_isolation_misiones_denied_nuevosur():
     """Confirma que la ruta REAL /campus/nuevosur retorna 403 Forbidden a un coordinador del campus Misiones."""
+    client.cookies.clear()
     repo = DataRepository()
     repo.clear_must_change_password("misiones", repo.hash_password_bcrypt("SecurePass2026!"))
 
