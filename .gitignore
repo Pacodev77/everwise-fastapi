@@ -9,7 +9,14 @@ __pycache__/
 *.pyc
 *.pyo
 
-# SQLite WAL & Temp Files
+# Variables de entorno y llaves secretas
+.env
+.env.*
+!.env.example
+
+# Base de datos local
+*.db
+data/*.db
 data/*.db-wal
 data/*.db-shm
 

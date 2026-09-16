@@ -1,0 +1,42 @@
+<div class="kpi-grid">
+    {% for nivel in escala %}
+    <div class="kpi-card glass-card">
+        <span class="badge {{ nivel.badge }}" style="font-size: 0.9rem;">{{ nivel.codigo }}</span>
+        <div style="font-weight: 700; margin-top: 0.4rem; color: var(--text-color);">{{ nivel.nombre }}</div>
+        <span class="kpi-subtext" style="margin-top: 0.2rem;">{{ nivel.descripcion }}</span>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="dashboard-card glass-card" style="margin-top: 1.5rem;">
+    <div class="card-header">
+        <h3>🧸 Rúbrica Cualitativa por Campo Formativo</h3>
+        <span class="badge badge-success">{{ campus }} - {{ ciclo }}</span>
+    </div>
+    <div class="table-responsive">
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Campo Formativo / Área</th>
+                    <th>Indicador Cualitativo Evaluado</th>
+                    <th>Kinder 1</th>
+                    <th>Kinder 2</th>
+                    <th>Kinder 3 / Pre-First</th>
+                    <th>Estatus Cualitativo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in evaluaciones %}
+                <tr>
+                    <td><strong>{{ row.area }}</strong></td>
+                    <td style="max-width: 280px; white-space: normal;">{{ row.indicador }}</td>
+                    <td><span class="badge badge-info">{{ row.k1 }}</span></td>
+                    <td><span class="badge badge-info">{{ row.k2 }}</span></td>
+                    <td><span class="badge badge-success">{{ row.k3 }}</span></td>
+                    <td><span class="badge badge-success">✓ {{ row.estatus }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

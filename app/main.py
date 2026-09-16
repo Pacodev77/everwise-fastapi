@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.services.data_repository import DataRepository
-from app.routers import auth, dashboard, campus, upload, academic, ixl, clima_disciplina, audit
+from app.routers import auth, dashboard, campus, upload, academic, ixl, clima_disciplina, audit, comparativa, preescolar
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -40,6 +40,8 @@ app.include_router(academic.router)
 app.include_router(ixl.router)
 app.include_router(clima_disciplina.router)
 app.include_router(audit.router)
+app.include_router(comparativa.router)
+app.include_router(preescolar.router)
 
 @app.get("/")
 async def root():

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Preescolar Cualitativo | Everwise Executive{% endblock %}
+
+{% block content %}
+<div class="header-banner glass-panel">
+    <div>
+        <h2>🧸 Evaluación Cualitativa de Preescolar</h2>
+        <p class="subtitle">Seguimiento de rúbricas del desarrollo infantil (K1, K2, K3) por campos formativos (Módulo puramente cualitativo, independiente del Índice Compuesto).</p>
+    </div>
+    <div class="filter-controls">
+        <select name="ciclo" class="form-select" hx-get="/preescolar/fragments/content" hx-target="#preescolar-content-container" hx-include="[name='campus']">
+            <option value="2025 - 2026" selected>Ciclo 2025 - 2026</option>
+            <option value="2026 - 2027">Ciclo 2026 - 2027</option>
+            <option value="2024 - 2025">Ciclo 2024 - 2025</option>
+        </select>
+        {% if user.role == "General" %}
+        <select name="campus" class="form-select" hx-get="/preescolar/fragments/content" hx-target="#preescolar-content-container" hx-include="[name='ciclo']">
+            <option value="Global" selected>Todos los Campus</option>
+            <option value="Misiones">Misiones</option>
+            <option value="Nuevo Sur">Nuevo Sur</option>
+            <option value="San Agustín">San Agustín</option>
+        </select>
+        {% endif %}
+    </div>
+</div>
+
+<div id="preescolar-content-container" hx-get="/preescolar/fragments/content?ciclo=2025%20-%202026" hx-trigger="load">
+    <div class="loading-state">Cargando rúbricas cualitativas de preescolar...</div>
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+<div class="kpi-grid">
+    <div class="kpi-card glass-card">
+        <span class="kpi-label">Índice Compuesto Global</span>
+        <div class="kpi-value text-accent">{{ promedio_global }} pts</div>
+        <span class="kpi-subtext">Media Ponderada por Matrícula Total (500 alumnos)</span>
+    </div>
+    <div class="kpi-card glass-card">
+        <span class="kpi-label">Estatus Institucional</span>
+        <div class="kpi-value text-success">{{ status_institucional }}</div>
+        <span class="kpi-subtext">Desempeño Consolidado de los 3 Campus</span>
+    </div>
+    <div class="kpi-card glass-card">
+        <span class="kpi-label">Criterio de Semáforos de Desviación</span>
+        <div style="font-size: 0.85rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.2rem;">
+            <span>🟢 <strong>Verde</strong>: Desviación ≥ -3.0% (Óptimo)</span>
+            <span>🟡 <strong>Amarillo</strong>: Desviación -3.0% a -5.0% (Alerta Moderada)</span>
+            <span>🔴 <strong>Rojo</strong>: Desviación &lt; -5.0% (Alerta Crítica)</span>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card glass-card" style="margin-top: 1.5rem;">
+    <div class="card-header">
+        <h3>📊 Matriz Comparativa Frente a Frente (Fase 4)</h3>
+        <span class="badge badge-info">Ciclo {{ ciclo }}</span>
+    </div>
+    <div class="table-responsive">
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Campus</th>
+                    <th>Matrícula</th>
+                    <th>Promedio Académico (50%)</th>
+                    <th>Dominio IXL (30%)</th>
+                    <th>Asistencia (20%)</th>
+                    <th>Índice Compuesto</th>
+                    <th>Desviación vs Media Global</th>
+                    <th>Semáforo de Desviación</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in comparativa_campus %}
+                <tr>
+                    <td><strong>{{ item.campus }}</strong></td>
+                    <td>{{ item.matricula }} alumnos</td>
+                    <td>{{ item.promedio_academico }} / 10</td>
+                    <td>{{ item.pct_ixl }}%</td>
+                    <td>{{ item.pct_asistencia }}%</td>
+                    <td><strong>{{ item.indice_compuesto }} pts</strong></td>
+                    <td>
+                        {% if item.desviacion_pct >= 0 %}
+                            <span class="text-success">+{{ item.desviacion_pct }}%</span>
+                        {% else %}
+                            <span class="{% if item.semaforo == 'rojo' %}text-danger{% elif item.semaforo == 'amarillo' %}text-warning{% else %}text-muted{% endif %}">
+                                {{ item.desviacion_pct }}%
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.semaforo == "verde" %}
+                            <span class="badge badge-success">🟢 Óptimo (≥ -3.0%)</span>
+                        {% elif item.semaforo == "amarillo" %}
+                            <span class="badge badge-warning">🟡 Alerta Moderada (-3.0% a -5.0%)</span>
+                        {% else %}
+                            <span class="badge badge-danger">🔴 Alerta Crítica (&lt; -5.0%)</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
