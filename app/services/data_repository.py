@@ -87,9 +87,12 @@ class DataRepository:
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS audit_logs (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    usuario TEXT NOT NULL,
-                    accion TEXT NOT NULL,
-                    detalle TEXT NOT NULL,
+                    username TEXT,
+                    action TEXT,
+                    details TEXT,
+                    usuario TEXT,
+                    accion TEXT,
+                    detalle TEXT,
                     campus TEXT,
                     ciclo_escolar TEXT,
                     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -139,30 +142,48 @@ class DataRepository:
     def add_audit_log(self, entry: AuditLogEntry):
         with self.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("""
-                INSERT INTO audit_logs (usuario, accion, detalle, campus, ciclo_escolar, timestamp)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (entry.usuario, entry.accion, entry.detalle, entry.campus, entry.ciclo_escolar, entry.timestamp))
+            cursor.execute("PRAGMA table_info(audit_logs)")
+            cols = [col["name"] for col in cursor.fetchall()]
+
+            if "username" in cols:
+                cursor.execute("""
+                    INSERT INTO audit_logs (username, action, details, campus, ciclo_escolar, timestamp)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """, (entry.usuario, entry.accion, entry.detalle, entry.campus, entry.ciclo_escolar, entry.timestamp))
+            else:
+                cursor.execute("""
+                    INSERT INTO audit_logs (usuario, accion, detalle, campus, ciclo_escolar, timestamp)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """, (entry.usuario, entry.accion, entry.detalle, entry.campus, entry.ciclo_escolar, entry.timestamp))
             conn.commit()
 
     def get_audit_logs(self, limit: int = 100, ciclo_escolar: Optional[str] = None) -> List[Dict[str, Any]]:
         with self.get_connection() as conn:
             cursor = conn.cursor()
-            if ciclo_escolar:
-                cursor.execute("""
-                    SELECT id, usuario as Usuario, accion as Acción, detalle as Detalle, 
+            cursor.execute("PRAGMA table_info(audit_logs)")
+            cols = [col["name"] for col in cursor.fetchall()]
+
+            user_col = "username" if "username" in cols else "usuario"
+            action_col = "action" if "action" in cols else "accion"
+            detail_col = "details" if "details" in cols else "detalle"
+
+            if ciclo_escolar and "ciclo_escolar" in cols:
+                query = f"""
+                    SELECT id, {user_col} as Usuario, {action_col} as Acción, {detail_col} as Detalle, 
                            campus as Campus, ciclo_escolar as 'Ciclo Escolar', timestamp as Timestamp
                     FROM audit_logs
                     WHERE ciclo_escolar = ?
                     ORDER BY id DESC LIMIT ?
-                """, (ciclo_escolar, limit))
+                """
+                cursor.execute(query, (ciclo_escolar, limit))
             else:
-                cursor.execute("""
-                    SELECT id, usuario as Usuario, accion as Acción, detalle as Detalle, 
-                           campus as Campus, ciclo_escolar as 'Ciclo Escolar', timestamp as Timestamp
+                query = f"""
+                    SELECT id, {user_col} as Usuario, {action_col} as Acción, {detail_col} as Detalle, 
+                           campus as Campus, timestamp as Timestamp
                     FROM audit_logs
                     ORDER BY id DESC LIMIT ?
-                """, (limit,))
+                """
+                cursor.execute(query, (limit,))
             rows = cursor.fetchall()
             return [dict(r) for r in rows]
 
@@ -174,7 +195,6 @@ class DataRepository:
             if not cursor.fetchone():
                 return pd.DataFrame()
 
-            # Inspeccionar columnas
             cursor.execute(f"PRAGMA table_info({table_name})")
             cols = [col["name"] for col in cursor.fetchall()]
 
