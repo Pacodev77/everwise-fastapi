@@ -42,18 +42,24 @@ def get_current_user_optional(request: Request) -> Optional[UserBase]:
             role=data["role"],
             name=data["name"],
             email=data.get("email"),
-            is_active=True
+            is_active=True,
+            must_change_password=data.get("must_change_password", False)
         )
     except (BadSignature, SignatureExpired, KeyError):
         return None
 
 def get_current_user(request: Request) -> UserBase:
-    """Dependencia FastAPI que exige usuario autenticado."""
+    """Dependencia FastAPI que exige usuario autenticado y sin cambio de contraseña pendiente."""
     user = get_current_user_optional(request)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_307_TEMPORARY_REDIRECT,
             headers={"Location": "/login"}
+        )
+    if user.must_change_password and request.url.path not in ["/change-password", "/logout"]:
+        raise HTTPException(
+            status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+            headers={"Location": "/change-password"}
         )
     return user
 
@@ -72,6 +78,8 @@ def require_role(allowed_roles: List[str]):
 async def render_login_page(request: Request):
     user = get_current_user_optional(request)
     if user:
+        if user.must_change_password:
+            return RedirectResponse(url="/change-password", status_code=status.HTTP_303_SEE_OTHER)
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
     return templates.TemplateResponse(request=request, name="login.html", context={"error": None})
 
@@ -95,18 +103,26 @@ async def login_post(
 
     # Verificar contraseña y realizar migración transparente a Bcrypt si era legacy SHA256 o '123'
     if repo.verify_password_and_migrate(username_clean, password, user_db.password_hash):
+        # Volver a cargar el objeto actualizado
+        user_updated = repo.get_user(username_clean)
+        must_change = user_updated.must_change_password if user_updated else user_db.must_change_password
+
         user_data = {
             "username": user_db.username,
             "role": user_db.role,
             "name": user_db.name,
-            "email": user_db.email
+            "email": user_db.email,
+            "must_change_password": must_change
         }
         
-        # Determinar URL de redirección según rol (RBAC)
-        redirect_url = "/dashboard"
-        if user_db.role in ["Misiones", "Nuevo Sur", "San Agustín"]:
-            campus_slug = user_db.role.lower().replace(" ", "")
-            redirect_url = f"/campus/{campus_slug}"
+        # Redirigir a /change-password si must_change_password es True
+        if must_change:
+            redirect_url = "/change-password"
+        else:
+            redirect_url = "/dashboard"
+            if user_db.role in ["Misiones", "Nuevo Sur", "San Agustín"]:
+                campus_slug = user_db.role.lower().replace(" ", "")
+                redirect_url = f"/campus/{campus_slug}"
 
         response = RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)
         create_session_cookie(response, user_data)
@@ -115,7 +131,7 @@ async def login_post(
         registrar_evento_auditoria(
             usuario=user_db.username,
             accion="LOGIN",
-            detalle=f"Inicio de sesión exitoso con rol {user_db.role} (Bcrypt auth)",
+            detalle=f"Inicio de sesión exitoso (Bcrypt auth, must_change={must_change})",
             campus=user_db.role if user_db.role != "General" else "Global",
             repo=repo
         )
@@ -127,6 +143,77 @@ async def login_post(
         context={"error": "Credenciales incorrectas o usuario inactivo."},
         status_code=status.HTTP_401_UNAUTHORIZED
     )
+
+@router.get("/change-password", response_class=HTMLResponse)
+async def render_change_password_page(request: Request):
+    user = get_current_user_optional(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    if not user.must_change_password:
+        return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+
+    return templates.TemplateResponse(request=request, name="change_password.html", context={"error": None})
+
+@router.post("/change-password", response_class=HTMLResponse)
+async def change_password_post(
+    request: Request,
+    new_password: str = Form(...),
+    confirm_password: str = Form(...)
+):
+    user = get_current_user_optional(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+
+    if new_password != confirm_password:
+        return templates.TemplateResponse(
+            request=request,
+            name="change_password.html",
+            context={"error": "Las contraseñas no coinciden. Inténtalo de nuevo."}
+        )
+
+    if len(new_password) < 6:
+        return templates.TemplateResponse(
+            request=request,
+            name="change_password.html",
+            context={"error": "La contraseña debe tener al menos 6 caracteres."}
+        )
+
+    if new_password == "123":
+        return templates.TemplateResponse(
+            request=request,
+            name="change_password.html",
+            context={"error": "Debes elegir una contraseña diferente a la predeterminada '123'."}
+        )
+
+    repo = DataRepository()
+    new_bcrypt_hash = repo.hash_password_bcrypt(new_password)
+    repo.clear_must_change_password(user.username, new_bcrypt_hash)
+
+    registrar_evento_auditoria(
+        usuario=user.username,
+        accion="CHANGE_PASSWORD",
+        detalle="Actualización obligatoria de contraseña completada a Bcrypt",
+        campus=user.role if user.role != "General" else "Global",
+        repo=repo
+    )
+
+    # Actualizar la cookie declarando must_change_password = False
+    user_data = {
+        "username": user.username,
+        "role": user.role,
+        "name": user.name,
+        "email": user.email,
+        "must_change_password": False
+    }
+
+    redirect_url = "/dashboard"
+    if user.role in ["Misiones", "Nuevo Sur", "San Agustín"]:
+        campus_slug = user.role.lower().replace(" ", "")
+        redirect_url = f"/campus/{campus_slug}"
+
+    response = RedirectResponse(url=redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+    create_session_cookie(response, user_data)
+    return response
 
 @router.get("/logout")
 @router.post("/logout")

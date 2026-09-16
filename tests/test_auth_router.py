@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.routers.auth import SESSION_COOKIE_NAME, require_role, get_current_user
 from app.models.user import UserBase
+from app.services.data_repository import DataRepository
 
 # Router auxiliar para verificar RBAC
 rbac_dummy_router = APIRouter(prefix="/test-campus", tags=["TestRBAC"])
@@ -29,18 +30,48 @@ def test_login_invalid_credentials():
     assert response.status_code == 401
     assert "Credenciales incorrectas" in response.text
 
-def test_login_success_and_cookie_issued():
+def test_login_success_and_redirects_to_change_password_first():
+    """Al ingresar con la clave por defecto 123, redirige primero a /change-password por seguridad."""
     response = client.post("/login", data={"username": "director", "password": "123"})
     assert response.status_code == 303
-    assert response.headers["location"] == "/dashboard"
+    assert response.headers["location"] == "/change-password"
     assert SESSION_COOKIE_NAME in response.cookies
 
 def test_session_cookie_flags():
-    """Confirms session cookie includes HttpOnly and SameSite=Lax flags."""
+    """Confirma que la cookie de sesión emite las banderas HttpOnly y SameSite=Lax."""
     response = client.post("/login", data={"username": "director", "password": "123"})
     cookie_header = response.headers.get("set-cookie", "")
     assert "HttpOnly" in cookie_header or "httponly" in cookie_header.lower()
     assert "samesite=lax" in cookie_header.lower()
+
+def test_change_password_flow_updates_db_and_redirects():
+    """
+    Confirma que al completar el formulario /change-password con una nueva contraseña válida,
+    se actualiza el hash Bcrypt en la BD, se limpia must_change_password a 0 y se permite ingresar.
+    """
+    # 1. Login inicial
+    login_resp = client.post("/login", data={"username": "nuevosur", "password": "123"})
+    cookie = login_resp.cookies.get(SESSION_COOKIE_NAME)
+
+    # 2. Cambiar contraseña
+    client.cookies.set(SESSION_COOKIE_NAME, cookie)
+    change_resp = client.post("/change-password", data={
+        "new_password": "NuevaPassword2026!",
+        "confirm_password": "NuevaPassword2026!"
+    })
+
+    assert change_resp.status_code == 303
+    assert change_resp.headers["location"] in ["/dashboard", "/campus/nuevosur"]
+
+    # 3. Verificar en la BD que must_change_password ahora es 0 (False)
+    repo = DataRepository()
+    user_db = repo.get_user("nuevosur")
+    assert user_db.must_change_password is False
+
+    # 4. Probar login con la NUEVA contraseña
+    new_login_resp = client.post("/login", data={"username": "nuevosur", "password": "NuevaPassword2026!"})
+    assert new_login_resp.status_code == 303
+    assert new_login_resp.headers["location"] == "/campus/nuevosur"
 
 def test_logout_clears_cookie():
     login_resp = client.post("/login", data={"username": "director", "password": "123"})
@@ -52,10 +83,6 @@ def test_logout_clears_cookie():
     assert logout_resp.headers["location"] == "/login"
 
 def test_rbac_isolation_misiones_denied_nuevosur():
-    """
-    Confirma explícitamente que un usuario con rol 'Misiones'
-    recibe un error HTTP 403 Forbidden al intentar acceder a una ruta de 'Nuevo Sur'.
-    """
     login_resp = client.post("/login", data={"username": "misiones", "password": "123"})
     cookie = login_resp.cookies.get(SESSION_COOKIE_NAME)
 

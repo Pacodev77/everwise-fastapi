@@ -82,9 +82,15 @@ class DataRepository:
                     name TEXT NOT NULL,
                     email TEXT,
                     is_active INTEGER DEFAULT 1,
+                    must_change_password INTEGER DEFAULT 1,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
+            cursor.execute("PRAGMA table_info(users)")
+            user_cols = [col["name"] for col in cursor.fetchall()]
+            if "must_change_password" not in user_cols:
+                cursor.execute("ALTER TABLE users ADD COLUMN must_change_password INTEGER DEFAULT 1")
+
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS audit_logs (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -107,7 +113,7 @@ class DataRepository:
                 if not cursor.fetchone():
                     p_hash = self.hash_password_bcrypt(p)
                     cursor.execute(
-                        "INSERT INTO users (username, password_hash, role, name, email) VALUES (?, ?, ?, ?, ?)",
+                        "INSERT INTO users (username, password_hash, role, name, email, must_change_password) VALUES (?, ?, ?, ?, ?, 1)",
                         (u, p_hash, r, n, e)
                     )
             conn.commit()
@@ -115,19 +121,25 @@ class DataRepository:
     def get_user(self, username: str) -> Optional[UserInDB]:
         with self.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute(
-                "SELECT username, password_hash, role, name, email, is_active FROM users WHERE username = ?",
-                (username,)
-            )
+            cursor.execute("PRAGMA table_info(users)")
+            cols = [col["name"] for col in cursor.fetchall()]
+            
+            select_cols = "username, password_hash, role, name, email, is_active"
+            if "must_change_password" in cols:
+                select_cols += ", must_change_password"
+
+            cursor.execute(f"SELECT {select_cols} FROM users WHERE username = ?", (username,))
             row = cursor.fetchone()
             if row and row["is_active"] == 1:
+                must_change = bool(row["must_change_password"]) if "must_change_password" in cols else True
                 return UserInDB(
                     username=row["username"],
                     password_hash=row["password_hash"],
                     role=row["role"],
                     name=row["name"],
                     email=row["email"],
-                    is_active=bool(row["is_active"])
+                    is_active=bool(row["is_active"]),
+                    must_change_password=must_change
                 )
         return None
 
@@ -136,6 +148,16 @@ class DataRepository:
             cursor = conn.cursor()
             cursor.execute(
                 "UPDATE users SET password_hash = ? WHERE username = ?",
+                (new_bcrypt_hash, username)
+            )
+            conn.commit()
+
+    def clear_must_change_password(self, username: str, new_bcrypt_hash: str):
+        """Actualiza la contraseña a Bcrypt y limpia la bandera must_change_password."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE users SET password_hash = ?, must_change_password = 0 WHERE username = ?",
                 (new_bcrypt_hash, username)
             )
             conn.commit()

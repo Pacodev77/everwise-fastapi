@@ -1,7 +1,7 @@
 # app/models/user.py
 
 from typing import Optional
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field
 
 class UserBase(BaseModel):
     username: str
@@ -9,6 +9,7 @@ class UserBase(BaseModel):
     name: str
     email: Optional[str] = None
     is_active: bool = True
+    must_change_password: bool = True
 
 class UserInDB(UserBase):
     password_hash: str
@@ -19,3 +20,7 @@ class UserResponse(UserBase):
 class LoginRequest(BaseModel):
     username: str
     password: str
+
+class ChangePasswordRequest(BaseModel):
+    new_password: str
+    confirm_password: str
