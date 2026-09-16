@@ -86,3 +86,39 @@ def test_rbac_isolation_misiones_denied_nuevosur():
     
     assert resp.status_code == 403
     assert "Acceso Restringido" in resp.json()["detail"]
+
+def test_require_role_unit_isolation_all_cases():
+    """
+    Prueba unitaria pura para require_role() en aislamiento que cubre los 4 casos:
+    1. Rol permitido sin 'General' en la lista -> Permitido (200 OK)
+    2. Rol no permitido sin 'General' en la lista -> 403 Forbidden
+    3. Rol no permitido CON 'General' en la lista -> 403 Forbidden
+    4. Rol permitido con 'General' en la lista -> Permitido (200 OK)
+    """
+    from fastapi import HTTPException
+
+    # Caso 1: Rol permitido sin 'General'
+    checker_1 = require_role(["Misiones"])
+    user_misiones = UserBase(username="misiones", role="Misiones", name="Misiones User", is_active=True)
+    role_func_1 = checker_1.__closure__[0].cell_contents if hasattr(checker_1, "__closure__") and checker_1.__closure__ else None
+    # Invocación directa del dependency wrapper
+    assert checker_1(user_misiones) == user_misiones
+
+    # Caso 2: Rol no permitido sin 'General'
+    user_nuevosur = UserBase(username="nuevosur", role="Nuevo Sur", name="Nuevo Sur User", is_active=True)
+    with pytest.raises(HTTPException) as exc_info_2:
+        checker_1(user_nuevosur)
+    assert exc_info_2.value.status_code == 403
+
+    # Caso 3: Rol no permitido CON 'General' en la lista (e.g. Misiones intentando acceder a ruta de Nuevo Sur)
+    checker_3 = require_role(["General", "Nuevo Sur"])
+    with pytest.raises(HTTPException) as exc_info_3:
+        checker_3(user_misiones)
+    assert exc_info_3.value.status_code == 403
+    assert "Acceso Restringido" in exc_info_3.value.detail
+
+    # Caso 4: Rol permitido con 'General' en la lista (Nuevo Sur y Director General)
+    checker_4 = require_role(["General", "Nuevo Sur"])
+    user_director = UserBase(username="director", role="General", name="Director General", is_active=True)
+    assert checker_4(user_nuevosur) == user_nuevosur
+    assert checker_4(user_director) == user_director
