@@ -1,0 +1,11 @@
+{% if error %}
+    <div class="alert alert-danger" role="alert" style="margin-bottom: 1.5rem;">
+        <strong>❌ Error de Ingesta:</strong> {{ error }}
+    </div>
+{% elif success %}
+    <div class="alert alert-success" role="alert" style="margin-bottom: 1.5rem;">
+        <strong>✅ Operación Exitosa:</strong> {{ message }}
+        <br>
+        <small style="opacity: 0.85;">Archivo procesado: <code>{{ filename }}</code> | Ciclo: {{ ciclo }} | Campus: {{ campus }}</small>
+    </div>
+{% endif %}

@@ -1,0 +1,43 @@
+<div class="table-responsive">
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Usuario</th>
+                <th>Acción Realizada</th>
+                <th>Detalle Operación</th>
+                <th>Campus Target</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td><code>#{{ log.id or log.ID or loop.index }}</code></td>
+                <td><strong>{{ log.Usuario or log.username or "Sistema" }}</strong></td>
+                <td>
+                    {% set action = log.Acción or log.action or "" %}
+                    {% if "LOGIN" in action %}
+                        <span class="badge badge-success">LOGIN</span>
+                    {% elif "UPLOAD" in action %}
+                        <span class="badge badge-info">{{ action }}</span>
+                    {% elif "CHANGE_PASSWORD" in action %}
+                        <span class="badge badge-warning">CHANGE_PASS</span>
+                    {% else %}
+                        <span class="badge badge-secondary">{{ action }}</span>
+                    {% endif %}
+                </td>
+                <td style="max-width: 320px; white-space: normal;">{{ log.Detalle or log.details or "" }}</td>
+                <td><span class="badge badge-info">{{ log.Campus or log.campus or "Global" }}</span></td>
+                <td><small style="opacity: 0.85;">{{ log.Timestamp or log.timestamp or "" }}</small></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                    No se encontraron registros de auditoría que coincidan con la búsqueda.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

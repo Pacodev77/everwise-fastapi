@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Desempeño Académico | Everwise Executive{% endblock %}
+
+{% block content %}
+<div class="header-banner glass-panel">
+    <div>
+        <h2>Desempeño Académico & Evaluación Bimestral</h2>
+        <p class="subtitle">Análisis de promedios por grado, grupo y materia del Ciclo Escolar activo.</p>
+    </div>
+    <div class="filter-controls">
+        <select name="ciclo" class="form-select" hx-get="/academic/fragments/content" hx-target="#academic-content-container" hx-include="[name='campus'], [name='materia']">
+            <option value="2025 - 2026" selected>Ciclo 2025 - 2026</option>
+            <option value="2026 - 2027">Ciclo 2026 - 2027</option>
+            <option value="2024 - 2025">Ciclo 2024 - 2025</option>
+        </select>
+        {% if user.role == "General" %}
+        <select name="campus" class="form-select" hx-get="/academic/fragments/content" hx-target="#academic-content-container" hx-include="[name='ciclo'], [name='materia']">
+            <option value="Global" selected>Todos los Campus</option>
+            <option value="Misiones">Misiones</option>
+            <option value="Nuevo Sur">Nuevo Sur</option>
+            <option value="San Agustín">San Agustín</option>
+        </select>
+        {% endif %}
+    </div>
+</div>
+
+<div id="academic-content-container" hx-get="/academic/fragments/content?ciclo=2025%20-%202026" hx-trigger="load">
+    <div class="loading-state">Cargando métricas de desempeño académico...</div>
+</div>
+{% endblock %}

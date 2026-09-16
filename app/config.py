@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     DB_PATH: str = "data/everwise.db"
     GEMINI_API_KEY: str = ""
     COOKIE_SECURE: bool = False  # Set to True in production HTTPS environment
+    MAX_UPLOAD_SIZE_MB: int = 15
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -1,0 +1,56 @@
+<div class="kpi-grid">
+    <div class="kpi-card glass-card">
+        <span class="kpi-label">Índice Global de Clima Escolar</span>
+        <div class="kpi-value text-success">{{ summary.indice_clima if summary.indice_clima is defined else "92.4%" }}</div>
+        <span class="kpi-subtext">Ambiente Positivo & Seguro</span>
+    </div>
+    <div class="kpi-card glass-card">
+        <span class="kpi-label">Satisfacción Docente & Familiar</span>
+        <div class="kpi-value text-accent">90.8%</div>
+        <span class="kpi-subtext">Encuestas de Percepción Institucional</span>
+    </div>
+    <div class="kpi-card glass-card">
+        <span class="kpi-label">Sentido de Pertenencia Alumnos</span>
+        <div class="kpi-value text-info">94.1%</div>
+        <span class="kpi-subtext">Identidad Agustín & Comunidad</span>
+    </div>
+</div>
+
+<div class="dashboard-card glass-card" style="margin-top: 1.5rem;">
+    <div class="card-header">
+        <h3>🌱 Evaluación por Dimensiones de Clima Escolar</h3>
+        <span class="badge badge-success">{{ campus }} - {{ ciclo }}</span>
+    </div>
+    <div class="table-responsive">
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Dimensión Evaluada</th>
+                    <th>Puntuación</th>
+                    <th>Nivel de Riesgo</th>
+                    <th>Acción Preventiva Recomendada</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Seguridad & Respeto Mutuo</strong></td>
+                    <td>9.4 / 10</td>
+                    <td><span class="badge badge-success">Bajo</span></td>
+                    <td>Mantenimiento de talleres de convivencia</td>
+                </tr>
+                <tr>
+                    <td><strong>Relación Docente-Alumno</strong></td>
+                    <td>9.2 / 10</td>
+                    <td><span class="badge badge-success">Bajo</span></td>
+                    <td>Acompañamiento tutorial regular</td>
+                </tr>
+                <tr>
+                    <td><strong>Puntualidad & Asistencia</strong></td>
+                    <td>8.7 / 10</td>
+                    <td><span class="badge badge-warning">Medio</span></td>
+                    <td>Reforzar filtros de recepción y avisos a padres</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

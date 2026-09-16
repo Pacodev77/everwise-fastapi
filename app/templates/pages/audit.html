@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Bitácora CRM & Auditoría | Everwise Executive{% endblock %}
+
+{% block content %}
+<div class="header-banner glass-panel">
+    <div>
+        <h2>Bitácora CRM & Historial de Auditoría</h2>
+        <p class="subtitle">Registro inmutable de actividades, cargas de datos y cambios de configuración del sistema.</p>
+    </div>
+    <div class="filter-controls">
+        <a href="/audit/export" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+            📥 Exportar Bitácora CSV
+        </a>
+    </div>
+</div>
+
+<div class="dashboard-card glass-card">
+    <div class="card-header" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+        <h3>🔍 Registro de Eventos e Historial</h3>
+        <div style="display: flex; gap: 0.5rem;">
+            <input type="text" 
+                   name="search" 
+                   placeholder="Buscar usuario, acción o detalle..." 
+                   class="form-select" 
+                   style="min-width: 260px;"
+                   hx-get="/audit/fragments/table" 
+                   hx-target="#audit-table-container" 
+                   hx-trigger="keyup changed delay:300ms">
+        </div>
+    </div>
+
+    <div id="audit-table-container" hx-get="/audit/fragments/table" hx-trigger="load">
+        <div class="loading-state">Cargando registros de auditoría...</div>
+    </div>
+</div>
+{% endblock %}

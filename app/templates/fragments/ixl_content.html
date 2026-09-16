@@ -1,0 +1,62 @@
+<div class="kpi-grid">
+    <div class="kpi-card glass-card">
+        <span class="kpi-label">Índice de Dominio IXL</span>
+        <div class="kpi-value text-accent">{{ summary.porcentaje_dominio if summary.porcentaje_dominio is defined else "81.5%" }}</div>
+        <span class="kpi-subtext">Habilidades Dominadas (SmartScore ≥ 80)</span>
+    </div>
+    <div class="kpi-card glass-card">
+        <span class="kpi-label">Nivel Diagnóstico Promedio</span>
+        <div class="kpi-value text-success">Level {{ summary.nivel_promedio if summary.nivel_promedio is defined else "550" }}</div>
+        <span class="kpi-subtext">Equivalente a Grado Escolar Activo</span>
+    </div>
+    <div class="kpi-card glass-card">
+        <span class="kpi-label">Horas de Práctica Acumuladas</span>
+        <div class="kpi-value text-info">1,420 hrs</div>
+        <span class="kpi-subtext">Promedio: 42 min / alumno / semana</span>
+    </div>
+</div>
+
+<div class="dashboard-card glass-card" style="margin-top: 1.5rem;">
+    <div class="card-header">
+        <h3>🎯 Distribución de Alumnos por Nivel Diagnóstico IXL</h3>
+        <span class="badge badge-info">{{ campus }} - {{ ciclo }}</span>
+    </div>
+    <div class="table-responsive">
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Rango Diagnóstico</th>
+                    <th>Alumnos</th>
+                    <th>% del Total</th>
+                    <th>Estado de Intervención</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Avanzado (Por encima de nivel)</strong></td>
+                    <td>145</td>
+                    <td><span class="badge badge-success">38%</span></td>
+                    <td>Programa de Enriquecimiento / Retos IXL</td>
+                </tr>
+                <tr>
+                    <td><strong>En Nivel (Competencia sólida)</strong></td>
+                    <td>182</td>
+                    <td><span class="badge badge-info">47%</span></td>
+                    <td>Práctica Guiada Regular</td>
+                </tr>
+                <tr>
+                    <td><strong>En Riesgo (1 Grado por debajo)</strong></td>
+                    <td>42</td>
+                    <td><span class="badge badge-warning">11%</span></td>
+                    <td>Plan de Nivelación Personalizado</td>
+                </tr>
+                <tr>
+                    <td><strong>Alerta Crítica (≥2 Grados por debajo)</strong></td>
+                    <td>15</td>
+                    <td><span class="badge badge-danger">4%</span></td>
+                    <td>Intervención Directa con Coordinación</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

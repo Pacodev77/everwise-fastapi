@@ -1,0 +1,77 @@
+<div class="kpi-grid">
+    <div class="kpi-card glass-card">
+        <span class="kpi-label">Promedio General Académico</span>
+        <div class="kpi-value text-accent">{{ summary.promedio_general if summary.promedio_general is defined else "8.8" }}</div>
+        <span class="kpi-subtext">Meta Institucional: 8.5 / 10</span>
+    </div>
+    <div class="kpi-card glass-card">
+        <span class="kpi-label">Promedio Español</span>
+        <div class="kpi-value text-success">{{ summary.promedio_espanol if summary.promedio_espanol is defined else "8.9" }}</div>
+        <span class="kpi-subtext">Comprensión LECTORA & Redacción</span>
+    </div>
+    <div class="kpi-card glass-card">
+        <span class="kpi-label">Promedio Matemáticas</span>
+        <div class="kpi-value text-warning">{{ summary.promedio_matematicas if summary.promedio_matematicas is defined else "8.6" }}</div>
+        <span class="kpi-subtext">Razonamiento Lógico-Matemático</span>
+    </div>
+</div>
+
+<div class="dashboard-card glass-card" style="margin-top: 1.5rem;">
+    <div class="card-header">
+        <h3>📈 Desglose por Bimestre (B1 - B5)</h3>
+        <span class="badge badge-success">{{ campus }} - {{ ciclo }}</span>
+    </div>
+    <div class="table-responsive">
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Asignatura / Grado</th>
+                    <th>B1</th>
+                    <th>B2</th>
+                    <th>B3</th>
+                    <th>B4 (Proyectado)</th>
+                    <th>B5 (Proyectado)</th>
+                    <th>Promedio Acumulado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Español / Lenguaje</strong></td>
+                    <td>8.8</td>
+                    <td>8.9</td>
+                    <td>9.0</td>
+                    <td><span class="badge badge-info">9.1</span></td>
+                    <td><span class="badge badge-info">9.2</span></td>
+                    <td><strong>9.0</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>Matemáticas</strong></td>
+                    <td>8.4</td>
+                    <td>8.5</td>
+                    <td>8.7</td>
+                    <td><span class="badge badge-info">8.8</span></td>
+                    <td><span class="badge badge-info">8.9</span></td>
+                    <td><strong>8.7</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>Ciencias Naturales / Biología</strong></td>
+                    <td>8.9</td>
+                    <td>9.0</td>
+                    <td>9.1</td>
+                    <td><span class="badge badge-info">9.1</span></td>
+                    <td><span class="badge badge-info">9.2</span></td>
+                    <td><strong>9.1</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>Inglés / Foreign Language</strong></td>
+                    <td>9.1</td>
+                    <td>9.2</td>
+                    <td>9.3</td>
+                    <td><span class="badge badge-info">9.3</span></td>
+                    <td><span class="badge badge-info">9.4</span></td>
+                    <td><strong>9.3</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

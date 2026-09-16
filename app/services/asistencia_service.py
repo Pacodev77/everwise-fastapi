@@ -54,3 +54,20 @@ def calcular_asistencia_global(
         "staff": round(staff_prom, 4),
         "promedio_global": prom_global
     }
+
+def parse_asistencia_file(file_bytes: bytes, ciclo_escolar: str = "2025 - 2026", campus: str = "Global") -> pd.DataFrame:
+    """Parsea bytes de asistencia y retorna un DataFrame con metadatos."""
+    try:
+        try:
+            df = pd.read_csv(pd.io.common.BytesIO(file_bytes))
+        except Exception:
+            df = pd.read_excel(pd.io.common.BytesIO(file_bytes))
+    except Exception as e:
+        raise Exception(f"No se pudo parsear el archivo de asistencia: {str(e)}")
+
+    if df.empty:
+        return df
+
+    df["ciclo_escolar"] = ciclo_escolar
+    df["campus"] = campus
+    return df

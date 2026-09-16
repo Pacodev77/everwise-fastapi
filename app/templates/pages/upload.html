@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Ingesta de Datos | Everwise Executive{% endblock %}
+
+{% block content %}
+<div class="header-banner glass-panel">
+    <div>
+        <h2>Ingesta Masiva & Procesamiento de Datos</h2>
+        <p class="subtitle">Carga de calificaciones, diagnósticos IXL, asistencia y clima escolar para el ciclo lectivo activo.</p>
+    </div>
+    <div class="campus-badge">
+        <span class="status-indicator"></span>
+        <span>{{ user.role if user.role != "General" else "Consolidado Institucional" }}</span>
+    </div>
+</div>
+
+<div id="upload-status-container">
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            <strong>❌ Error de Ingesta:</strong> {{ error }}
+        </div>
+    {% elif success %}
+        <div class="alert alert-success" role="alert">
+            <strong>✅ Operación Exitosa:</strong> {{ message }}
+            <br>
+            <small>Archivo procesado: <code>{{ filename }}</code> | Ciclo: {{ ciclo }} | Campus: {{ campus }}</small>
+        </div>
+    {% endif %}
+</div>
+
+<div class="dashboard-grid grid-2-col">
+    <!-- Card 1: Calificaciones Académicas -->
+    <div class="dashboard-card glass-card">
+        <div class="card-header">
+            <h3>📊 Calificaciones Académicas (B1 - B5)</h3>
+            <span class="badge badge-info">Excel / CSV</span>
+        </div>
+        <p class="card-desc">Sube los reportes de promedios por grado, grupo y materia. Formato aceptado: <code>.xlsx</code>, <code>.csv</code> (Máx. 15MB).</p>
+        
+        <form hx-post="/upload/academic" 
+              hx-target="#upload-status-container" 
+              hx-encoding="multipart/form-data" 
+              class="upload-form">
+            <div class="form-group">
+                <label for="ciclo-acad">Ciclo Escolar Target:</label>
+                <select id="ciclo-acad" name="ciclo" class="form-select">
+                    <option value="2025 - 2026" selected>2025 - 2026</option>
+                    <option value="2026 - 2027">2026 - 2027</option>
+                    <option value="2024 - 2025">2024 - 2025</option>
+                </select>
+            </div>
+            
+            {% if user.role == "General" %}
+            <div class="form-group">
+                <label for="campus-acad">Campus Destino:</label>
+                <select id="campus-acad" name="campus" class="form-select">
+                    <option value="Global">Global / Multicampus</option>
+                    <option value="Misiones">Misiones</option>
+                    <option value="Nuevo Sur">Nuevo Sur</option>
+                    <option value="San Agustín">San Agustín</option>
+                </select>
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <input type="file" name="file" accept=".xlsx,.xls,.csv" required class="file-input">
+            </div>
+            <button type="submit" class="btn btn-primary">Procesar Calificaciones</button>
+        </form>
+    </div>
+
+    <!-- Card 2: Diagnósticos IXL -->
+    <div class="dashboard-card glass-card">
+        <div class="card-header">
+            <h3>🎯 Diagnósticos IXL & Dominio</h3>
+            <span class="badge badge-info">Excel / CSV</span>
+        </div>
+        <p class="card-desc">Carga de reportes diagnósticos IXL con niveles de habilidad por alumno y grupo.</p>
+        
+        <form hx-post="/upload/ixl" 
+              hx-target="#upload-status-container" 
+              hx-encoding="multipart/form-data" 
+              class="upload-form">
+            <div class="form-group">
+                <label for="ciclo-ixl">Ciclo Escolar Target:</label>
+                <select id="ciclo-ixl" name="ciclo" class="form-select">
+                    <option value="2025 - 2026" selected>2025 - 2026</option>
+                    <option value="2026 - 2027">2026 - 2027</option>
+                    <option value="2024 - 2025">2024 - 2025</option>
+                </select>
+            </div>
+
+            {% if user.role == "General" %}
+            <div class="form-group">
+                <label for="campus-ixl">Campus Destino:</label>
+                <select id="campus-ixl" name="campus" class="form-select">
+                    <option value="Global">Global / Multicampus</option>
+                    <option value="Misiones">Misiones</option>
+                    <option value="Nuevo Sur">Nuevo Sur</option>
+                    <option value="San Agustín">San Agustín</option>
+                </select>
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <input type="file" name="file" accept=".xlsx,.xls,.csv" required class="file-input">
+            </div>
+            <button type="submit" class="btn btn-primary">Procesar Reporte IXL</button>
+        </form>
+    </div>
+
+    <!-- Card 3: Asistencia Escolar -->
+    <div class="dashboard-card glass-card">
+        <div class="card-header">
+            <h3>📅 Registro de Asistencia</h3>
+            <span class="badge badge-info">Excel / CSV</span>
+        </div>
+        <p class="card-desc">Carga del concentrado de asistencia diaria e incidencias de puntualidad por grupo.</p>
+        
+        <form hx-post="/upload/asistencia" 
+              hx-target="#upload-status-container" 
+              hx-encoding="multipart/form-data" 
+              class="upload-form">
+            <div class="form-group">
+                <label for="ciclo-asis">Ciclo Escolar Target:</label>
+                <select id="ciclo-asis" name="ciclo" class="form-select">
+                    <option value="2025 - 2026" selected>2025 - 2026</option>
+                    <option value="2026 - 2027">2026 - 2027</option>
+                    <option value="2024 - 2025">2024 - 2025</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <input type="file" name="file" accept=".xlsx,.xls,.csv" required class="file-input">
+            </div>
+            <button type="submit" class="btn btn-primary">Procesar Asistencia</button>
+        </form>
+    </div>
+
+    <!-- Card 4: Clima Escolar & Disciplina -->
+    <div class="dashboard-card glass-card">
+        <div class="card-header">
+            <h3>🌱 Clima Escolar & Disciplina</h3>
+            <span class="badge badge-info">Excel / CSV</span>
+        </div>
+        <p class="card-desc">Encuestas de convivencia escolar, incidencias disciplinarias y seguimiento de compromisos.</p>
+        
+        <form hx-post="/upload/clima_disciplina" 
+              hx-target="#upload-status-container" 
+              hx-encoding="multipart/form-data" 
+              class="upload-form">
+            <div class="form-group">
+                <label for="tipo-cd">Tipo de Reporte:</label>
+                <select id="tipo-cd" name="tipo" class="form-select">
+                    <option value="clima" selected>Encuesta de Clima Escolar</option>
+                    <option value="disciplina">Incidencias Disciplinarias</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="ciclo-cd">Ciclo Escolar Target:</label>
+                <select id="ciclo-cd" name="ciclo" class="form-select">
+                    <option value="2025 - 2026" selected>2025 - 2026</option>
+                    <option value="2026 - 2027">2026 - 2027</option>
+                    <option value="2024 - 2025">2024 - 2025</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <input type="file" name="file" accept=".xlsx,.xls,.csv" required class="file-input">
+            </div>
+            <button type="submit" class="btn btn-primary">Procesar Clima / Disciplina</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

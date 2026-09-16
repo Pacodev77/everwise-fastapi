@@ -26,27 +26,36 @@
                 📊 Resumen Ejecutivo
             </a>
         </li>
-        {% if user.role == "General" or user.role == "Misiones" %}
         <li class="nav-item">
-            <a href="/campus/misiones" class="nav-link {% if active_tab == 'misiones' %}active{% endif %}">
-                🏫 Campus Misiones
+            <a href="/academic" class="nav-link {% if active_tab == 'academic' %}active{% endif %}">
+                📈 Desempeño Académico
             </a>
         </li>
-        {% endif %}
-        {% if user.role == "General" or user.role == "Nuevo Sur" %}
         <li class="nav-item">
-            <a href="/campus/nuevosur" class="nav-link {% if active_tab == 'nuevosur' %}active{% endif %}">
-                🏫 Campus Nuevo Sur
+            <a href="/ixl" class="nav-link {% if active_tab == 'ixl' %}active{% endif %}">
+                🎯 Diagnóstico IXL
             </a>
         </li>
-        {% endif %}
-        {% if user.role == "General" or user.role == "San Agustín" %}
         <li class="nav-item">
-            <a href="/campus/sanagustin" class="nav-link {% if active_tab == 'sanagustin' %}active{% endif %}">
-                🏫 Campus San Agustín
+            <a href="/clima" class="nav-link {% if active_tab == 'clima' %}active{% endif %}">
+                🌱 Clima Escolar
             </a>
         </li>
-        {% endif %}
+        <li class="nav-item">
+            <a href="/disciplina" class="nav-link {% if active_tab == 'disciplina' %}active{% endif %}">
+                📋 Disciplina
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/upload" class="nav-link {% if active_tab == 'upload' %}active{% endif %}">
+                📁 Ingesta de Datos
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/audit" class="nav-link {% if active_tab == 'audit' %}active{% endif %}">
+                🔍 Bitácora CRM
+            </a>
+        </li>
     </ul>
 
     <div class="user-profile">

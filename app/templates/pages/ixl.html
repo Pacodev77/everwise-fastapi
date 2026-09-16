@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Diagnóstico IXL | Everwise Executive{% endblock %}
+
+{% block content %}
+<div class="header-banner glass-panel">
+    <div>
+        <h2>Dominio & Diagnóstico Continuo IXL</h2>
+        <p class="subtitle">Monitoreo del nivel de maestría en habilidades matemáticas y del lenguaje por campus.</p>
+    </div>
+    <div class="filter-controls">
+        <select name="ciclo" class="form-select" hx-get="/ixl/fragments/content" hx-target="#ixl-content-container" hx-include="[name='campus']">
+            <option value="2025 - 2026" selected>Ciclo 2025 - 2026</option>
+            <option value="2026 - 2027">Ciclo 2026 - 2027</option>
+            <option value="2024 - 2025">Ciclo 2024 - 2025</option>
+        </select>
+        {% if user.role == "General" %}
+        <select name="campus" class="form-select" hx-get="/ixl/fragments/content" hx-target="#ixl-content-container" hx-include="[name='ciclo']">
+            <option value="Global" selected>Todos los Campus</option>
+            <option value="Misiones">Misiones</option>
+            <option value="Nuevo Sur">Nuevo Sur</option>
+            <option value="San Agustín">San Agustín</option>
+        </select>
+        {% endif %}
+    </div>
+</div>
+
+<div id="ixl-content-container" hx-get="/ixl/fragments/content?ciclo=2025%20-%202026" hx-trigger="load">
+    <div class="loading-state">Cargando métricas diagnósticas IXL...</div>
+</div>
+{% endblock %}
