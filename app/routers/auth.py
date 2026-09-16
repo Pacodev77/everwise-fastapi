@@ -61,7 +61,6 @@ def require_role(allowed_roles: List[str]):
     """Dependencia de autorización basada en roles (RBAC)."""
     def role_checker(user: UserBase = Depends(get_current_user)):
         if user.role not in allowed_roles and "General" not in allowed_roles:
-            # Si es coordinador de campus y no tiene acceso al dashboard global, redirigir a su campus
             if user.role in ["Misiones", "Nuevo Sur", "San Agustín"]:
                 campus_slug = user.role.lower().replace(" ", "")
                 raise HTTPException(
@@ -80,7 +79,7 @@ async def render_login_page(request: Request):
     user = get_current_user_optional(request)
     if user:
         return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
-    return templates.TemplateResponse("login.html", {"request": request, "error": None})
+    return templates.TemplateResponse(request=request, name="login.html", context={"error": None})
 
 @router.post("/login", response_class=HTMLResponse)
 async def login_post(
@@ -94,8 +93,9 @@ async def login_post(
 
     if not user_db:
         return templates.TemplateResponse(
-            "login.html", 
-            {"request": request, "error": "Credenciales incorrectas o usuario inactivo."},
+            request=request,
+            name="login.html", 
+            context={"error": "Credenciales incorrectas o usuario inactivo."},
             status_code=status.HTTP_401_UNAUTHORIZED
         )
 
@@ -128,8 +128,9 @@ async def login_post(
         return response
 
     return templates.TemplateResponse(
-        "login.html", 
-        {"request": request, "error": "Credenciales incorrectas o usuario inactivo."},
+        request=request,
+        name="login.html", 
+        context={"error": "Credenciales incorrectas o usuario inactivo."},
         status_code=status.HTTP_401_UNAUTHORIZED
     )
 

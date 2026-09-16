@@ -22,9 +22,9 @@ async def render_dashboard_page(
     current_user: UserBase = Depends(get_current_user)
 ):
     return templates.TemplateResponse(
-        "pages/dashboard.html",
-        {
-            "request": request,
+        request=request,
+        name="pages/dashboard.html",
+        context={
             "user": current_user,
             "ciclo_seleccionado": ciclo,
             "active_tab": "resumen"
@@ -43,15 +43,14 @@ async def render_kpis_fragment(
     Cada cambio de selector de Ciclo Escolar dispara este endpoint con parámetros explícitos,
     impidiendo cualquier arrastre de datos en memoria.
     """
-    # Valores dinámicos calculados por ciclo y campus
     math_val = "87.8%" if ciclo == "2025 - 2026" else "84.2%"
     esp_val = "89.2%" if ciclo == "2025 - 2026" else "86.0%"
     asis_val = "94.5%" if ciclo == "2025 - 2026" else "92.1%"
 
     return templates.TemplateResponse(
-        "fragments/kpi_summary.html",
-        {
-            "request": request,
+        request=request,
+        name="fragments/kpi_summary.html",
+        context={
             "ciclo": ciclo,
             "campus": campus,
             "asis_val": asis_val,
@@ -69,9 +68,9 @@ async def render_composite_chart_fragment(
     """Endpoint HTMX para renderizar el gráfico y semáforo del Índice Compuesto."""
     response = calcular_indice_compuesto(ciclo_escolar=ciclo)
     return templates.TemplateResponse(
-        "fragments/composite_chart.html",
-        {
-            "request": request,
+        request=request,
+        name="fragments/composite_chart.html",
+        context={
             "ciclo": ciclo,
             "composite_response": response
         }
@@ -102,9 +101,9 @@ async def render_ai_insights_fragment(
     )
 
     return templates.TemplateResponse(
-        "fragments/ai_insights.html",
-        {
-            "request": request,
+        request=request,
+        name="fragments/ai_insights.html",
+        context={
             "ciclo": ciclo,
             "campus": campus,
             "insights": insights
