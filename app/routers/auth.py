@@ -19,7 +19,7 @@ SESSION_COOKIE_NAME = "everwise_session"
 MAX_AGE_SECONDS = 86400  # 24 Horas
 
 def create_session_cookie(response: Response, user_data: dict):
-    """Firma los datos del usuario y genera una cookie HTTP-Only segura."""
+    """Firma los datos del usuario y genera una cookie de sesión HTTP-Only, SameSite=Lax y Secure."""
     token = serializer.dumps(user_data)
     response.set_cookie(
         key=SESSION_COOKIE_NAME,
@@ -27,7 +27,7 @@ def create_session_cookie(response: Response, user_data: dict):
         max_age=MAX_AGE_SECONDS,
         httponly=True,
         samesite="lax",
-        secure=False  # Cambiar a True en HTTPS producción
+        secure=settings.COOKIE_SECURE
     )
 
 def get_current_user_optional(request: Request) -> Optional[UserBase]:

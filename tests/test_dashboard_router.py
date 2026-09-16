@@ -23,20 +23,31 @@ def test_dashboard_authenticated_success(auth_cookie):
     assert response.status_code == 200
     assert "Resumen Data 2025 - 2026" in response.text
 
-def test_htmx_kpis_fragment_deterministic_cycle(auth_cookie):
+def test_reproducir_solucion_bug_selector_ciclo_escolar(auth_cookie):
+    """
+    Prueba automatizada que reproduce la interacción del selector de Ciclo Escolar en la misma sesión HTTP.
+    Verifica que al cambiar el ciclo, los datos devueltos por el fragmento HTMX cambian
+    de manera determinista y no retienen valores anteriores en memoria.
+    """
     client.cookies.set(SESSION_COOKIE_NAME, auth_cookie)
-    
-    # Probar Ciclo 2025 - 2026
+
+    # 1. Petición inicial para Ciclo 2025 - 2026
     resp1 = client.get("/dashboard/fragments/kpis?ciclo=2025 - 2026")
     assert resp1.status_code == 200
     assert "2025 - 2026" in resp1.text
     assert "87.8%" in resp1.text
 
-    # Probar cambio a Ciclo 2026 - 2027
+    # 2. Cambio inmediato en la misma sesión a Ciclo 2026 - 2027
     resp2 = client.get("/dashboard/fragments/kpis?ciclo=2026 - 2027")
     assert resp2.status_code == 200
     assert "2026 - 2027" in resp2.text
     assert "84.2%" in resp2.text
+    assert "87.8%" not in resp2.text  # Garantiza que el valor anterior NO se quedó en memoria
+
+    # 3. Retorno a Ciclo 2024 - 2025
+    resp3 = client.get("/dashboard/fragments/kpis?ciclo=2024 - 2025")
+    assert resp3.status_code == 200
+    assert "2024 - 2025" in resp3.text
 
 def test_htmx_composite_chart_fragment(auth_cookie):
     client.cookies.set(SESSION_COOKIE_NAME, auth_cookie)

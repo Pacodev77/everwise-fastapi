@@ -4,7 +4,8 @@ import sqlite3
 import os
 import pandas as pd
 from typing import List, Dict, Optional, Any, Tuple
-import bcrypt
+# pyrefly: ignore [missing-import]
+import bcrypt 
 import hashlib
 from app.config import settings
 from app.models.audit import AuditLogEntry

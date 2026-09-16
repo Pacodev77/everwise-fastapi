@@ -1,6 +1,7 @@
 # app/config.py
 
 import os
+# pyrefly: ignore [missing-import]
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
@@ -9,6 +10,7 @@ class Settings(BaseSettings):
     SECRET_AUTH_KEY: str = "everwise_secure_session_key_2026_enterprise"
     DB_PATH: str = "data/everwise.db"
     GEMINI_API_KEY: str = ""
+    COOKIE_SECURE: bool = False  # Set to True in production HTTPS environment
 
     model_config = SettingsConfigDict(
         env_file=".env",
